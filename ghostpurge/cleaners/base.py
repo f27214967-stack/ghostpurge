@@ -10,6 +10,9 @@ class BaseCleaner(ABC):
         pass
 
     def should_clean(self, package_name: str, source: str, artifact: str) -> bool:
+        if not package_name or package_name.strip() == "":
+            return False
+            
         mode = self.config.get("mode", "aggressive")
         blacklist = self.config.get("blacklist", [])
         
