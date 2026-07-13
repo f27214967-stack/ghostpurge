@@ -68,7 +68,7 @@ class GhostPurgeDaemon:
                 return True
         elif source == "npm":
             npm_dir = self.config.get("paths.npm_dir", "")
-            if Path(os.path.join(npm_dir, package_name).exists()):
+            if Path(os.path.join(npm_dir, package_name)).exists():
                 return True
         return False
 

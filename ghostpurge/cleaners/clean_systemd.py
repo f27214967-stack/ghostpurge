@@ -1,6 +1,5 @@
 from pathlib import Path
 import logging
-import os
 from ghostpurge.cleaners.base import BaseCleaner
 from ghostpurge.cleaners.registry import CleanerRegistry
 from ghostpurge.utils import run_command

@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Callable
 from ghostpurge.config import Config
 import logging
-import os
 from ghostpurge.watchers.base import BaseWatcher, WatcherRegistry
 from inotify_simple import INotify, flags
 

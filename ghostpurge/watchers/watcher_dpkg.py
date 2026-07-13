@@ -1,5 +1,4 @@
 from contextlib import suppress
-from pathlib import Path
 from typing import Callable
 from ghostpurge.config import Config
 import logging
