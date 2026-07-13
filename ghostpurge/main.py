@@ -107,7 +107,6 @@ class GhostPurgeDaemon:
         for w in self.watchers:
             w.start()
             
-        sleep_interval = self.config.get("daemon.sleep_interval", 5)
         
         try:
             while self.running:
