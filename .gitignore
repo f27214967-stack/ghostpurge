@@ -1,0 +1,18 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.pytest_cache/
+
+# Systemd
+*.service
+
+# Logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.egg-info/

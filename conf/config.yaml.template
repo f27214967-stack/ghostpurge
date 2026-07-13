@@ -1,0 +1,38 @@
+# GhostPurge - Advanced Cleanup Service Configuration
+
+# Modes de nettoyage :
+# - conservative : nettoie uniquement les configs et caches légers.
+# - aggressive : nettoie configs, caches, logs et orphelins (par défaut).
+# - hyper-aggressive : purge absolue (peut inclure des suppressions partagées, à utiliser avec prudence).
+mode: "aggressive"
+
+# Liste de paquets/apps intouchables
+whitelist:
+  - "sudo"
+  - "bash"
+  - "coreutils"
+  - "systemd"
+
+# Liste de paquets/apps pour lesquels un nettoyage hyper-agressif est forcé
+blacklist:
+  - "discord"
+  - "spotify"
+  - "steam"
+
+# Chemins spécifiques à surveiller pour le nettoyage
+paths:
+  log_dir: "/var/log"
+  cache_dir: "/var/cache"
+  config_dir: "/etc"
+  lib_dir: "/var/lib"
+  flatpak_dir: "/var/lib/flatpak/app"
+  snap_dir: "/var/lib/snapd/snaps"
+  steam_dir: "/home/user/.steam/steam/steamapps/common"
+  pip_dir: "/home/user/.local/lib/python3.11/site-packages"
+  npm_dir: "/home/user/.npm"
+
+# Daemon configuration
+daemon:
+  sleep_interval: 5
+  log_file: "/var/log/ghostpurge.log"
+  log_level: "INFO"

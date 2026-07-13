@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["ghostpurge*"]
+
+[project]
+name = "ghostpurge"
+version = "2.0.0"
+description = "Service Python avancé de nettoyage post-désinstallation (Apt, Flatpak, Snap, Pip, Npm, Steam)"
+authors = [{name = "GhostPurge Contributors"}]
+requires-python = ">=3.11"
+dependencies = [
+    "inotify_simple>=1.3.5",
+    "PyYAML>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.3",
+    "mypy>=1.0",
+    "xenon>=0.9",
+    "types-PyYAML"
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
