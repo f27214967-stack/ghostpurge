@@ -72,10 +72,34 @@ class GhostPurgeDaemon:
                 return True
         return False
 
+    def _is_pm_running(self, source: str) -> bool:
+        """Checks if the package manager is still running."""
+        import subprocess
+        patterns = {
+            'apt': ['apt', 'apt-get', 'dpkg'],
+            'pip': ['pip'],
+            'npm': ['npm'],
+            'flatpak': ['flatpak'],
+            'snap': ['snap'],
+            'steam': ['steam']
+        }
+        for p in patterns.get(source, []):
+            if subprocess.run(['pgrep', '-f', rf'\b{p}\b'], capture_output=True).returncode == 0:
+                return True
+        return False
+
     def _process_pending_cleans(self) -> None:
         now = time.time()
         to_clean = []
         for key, ts in list(self.pending_cleans.items()):
+            pkg, src = key
+            
+            # If the manager is downloading or compiling (e.g. pip install takes 10 mins)
+            if self._is_pm_running(src):
+                # Reset timer to wait 5s AFTER the process finishes
+                self.pending_cleans[key] = now
+                continue
+
             # If 5 seconds have elapsed
             if now - ts >= 5:
                 to_clean.append(key)
