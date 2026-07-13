@@ -23,7 +23,7 @@ class BaseCleaner(ABC):
             return True
             
         if mode == "conservative":
-            return artifact in ["config", "cache"]
+            return artifact in ("config", "cache")
             
         # mode aggressive (default)
         return True

@@ -1,3 +1,5 @@
+from contextlib import suppress
+from pathlib import Path
 from typing import Callable
 from ghostpurge.config import Config
 import logging
@@ -16,7 +18,7 @@ class FlatpakWatcher(BaseWatcher):
         self.mask = flags.DELETE | flags.MOVED_FROM
 
     def start(self) -> None:
-        if not os.path.exists(self.watch_dir):
+        if not Path(self.watch_dir).exists():
             return
         try:
             self.inotify.add_watch(self.watch_dir, self.mask)
@@ -25,10 +27,8 @@ class FlatpakWatcher(BaseWatcher):
             logger.error(f"Erreur watch Flatpak: {e}")
 
     def check_events(self, timeout: int) -> None:
-        try:
+        with suppress(Exception):
             for event in self.inotify.read(timeout=timeout * 1000):
                 pkg = event.name
                 if pkg:
                     self.callback(pkg, "flatpak")
-        except Exception:
-            pass

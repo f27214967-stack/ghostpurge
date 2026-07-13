@@ -1,3 +1,5 @@
+from contextlib import suppress
+from pathlib import Path
 from typing import Callable
 from ghostpurge.config import Config
 import logging
@@ -17,7 +19,7 @@ class AppImageWatcher(BaseWatcher):
         self.mask = flags.DELETE | flags.MOVED_FROM
 
     def start(self) -> None:
-        if not os.path.exists(self.watch_dir):
+        if not Path(self.watch_dir).exists():
             return
         try:
             self.inotify.add_watch(self.watch_dir, self.mask)
@@ -26,10 +28,8 @@ class AppImageWatcher(BaseWatcher):
             logger.error(f"Erreur watch AppImage: {e}")
 
     def check_events(self, timeout: int) -> None:
-        try:
+        with suppress(Exception):
             for event in self.inotify.read(timeout=timeout * 1000):
                 if event.name and event.name.endswith(".AppImage"):
                     pkg = event.name.replace(".AppImage", "")
                     self.callback(pkg, "appimage")
-        except Exception:
-            pass

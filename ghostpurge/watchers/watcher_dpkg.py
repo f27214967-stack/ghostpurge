@@ -1,3 +1,5 @@
+from contextlib import suppress
+from pathlib import Path
 from typing import Callable
 from ghostpurge.config import Config
 import logging
@@ -25,16 +27,14 @@ class DpkgWatcher(BaseWatcher):
             logger.error(f"Erreur watch DPKG: {e}")
 
     def check_events(self, timeout: int) -> None:
-        try:
+        with suppress(Exception):
             events = self.inotify.read(timeout=timeout * 1000)
             if events:
                 self._check_log()
-        except Exception:
-            pass
         self.recent_removals.clear()
 
     def _check_log(self) -> None:
-        try:
+        with suppress(Exception):
             with open(self.watch_file, 'r') as f:
                 lines = f.readlines()[-10:]
                 for line in lines:
@@ -44,5 +44,3 @@ class DpkgWatcher(BaseWatcher):
                         if pkg not in self.recent_removals:
                             self.recent_removals.add(pkg)
                             self.callback(pkg, "apt")
-        except Exception:
-            pass

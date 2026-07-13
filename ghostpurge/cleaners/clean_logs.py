@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 import os
 import shutil
@@ -17,7 +18,7 @@ class LogsCleaner(BaseCleaner):
         log_dir = self.config.get("paths.log_dir", "/var/log")
         
         target_dir = os.path.join(log_dir, package_name)
-        if os.path.exists(target_dir) and os.path.isdir(target_dir):
+        if Path(target_dir).exists() and Path(target_dir).is_dir():
             try:
                 shutil.rmtree(target_dir)
                 logger.info(f"Dossier de logs supprimé : {target_dir}")
@@ -27,7 +28,7 @@ class LogsCleaner(BaseCleaner):
         pattern = os.path.join(log_dir, f"{package_name}*.log*")
         for filepath in glob.glob(pattern):
             try:
-                os.remove(filepath)
+                Path(filepath).unlink()
                 logger.info(f"Fichier de log supprimé : {filepath}")
             except Exception as e:
                 logger.error(f"Erreur suppression {filepath}: {e}")

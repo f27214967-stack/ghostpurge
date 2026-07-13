@@ -1,3 +1,5 @@
+from contextlib import suppress
+from pathlib import Path
 from typing import Callable
 from ghostpurge.config import Config
 import logging
@@ -16,7 +18,7 @@ class PipWatcher(BaseWatcher):
         self.mask = flags.DELETE | flags.MOVED_FROM
 
     def start(self) -> None:
-        if not os.path.exists(self.watch_dir):
+        if not Path(self.watch_dir).exists():
             return
         try:
             self.inotify.add_watch(self.watch_dir, self.mask)
@@ -25,10 +27,8 @@ class PipWatcher(BaseWatcher):
             logger.error(f"Erreur watch Pip: {e}")
 
     def check_events(self, timeout: int) -> None:
-        try:
+        with suppress(Exception):
             for event in self.inotify.read(timeout=timeout * 1000):
                 if event.name and event.name.endswith(".dist-info"):
                     pkg = event.name.split('-')[0]
                     self.callback(pkg, "pip")
-        except Exception:
-            pass

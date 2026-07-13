@@ -1,3 +1,4 @@
+from pathlib import Path
 import argparse
 import signal
 import logging
@@ -67,7 +68,7 @@ class GhostPurgeDaemon:
                 return True
         elif source == "npm":
             npm_dir = self.config.get("paths.npm_dir", "")
-            if os.path.exists(os.path.join(npm_dir, package_name)):
+            if Path(os.path.join(npm_dir, package_name).exists()):
                 return True
         return False
 

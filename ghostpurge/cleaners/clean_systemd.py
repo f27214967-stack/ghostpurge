@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 import os
 from ghostpurge.cleaners.base import BaseCleaner
@@ -15,9 +16,9 @@ class SystemdCleaner(BaseCleaner):
         logger.info(f"[{source}] Checking systemd services for {package_name}...")
         
         service_file = f"/etc/systemd/system/{package_name}.service"
-        if os.path.exists(service_file):
+        if Path(service_file).exists():
             try:
-                os.remove(service_file)
+                Path(service_file).unlink()
                 run_command(["systemctl", "daemon-reload"])
                 logger.info(f"Service {package_name} supprimé.")
             except Exception as e:

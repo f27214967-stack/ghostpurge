@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 import os
 import shutil
@@ -25,7 +26,7 @@ class ConfigCleaner(BaseCleaner):
 
         # Purge dans ~/.config (commun à platpak, snap, appimage, etc.)
         user_config = os.path.expanduser(f"~/.config/{package_name}")
-        if os.path.exists(user_config) and os.path.isdir(user_config):
+        if Path(user_config).exists() and Path(user_config).is_dir():
             try:
                 shutil.rmtree(user_config)
                 logger.info(f"Dossier de config utilisateur supprimé : {user_config}")

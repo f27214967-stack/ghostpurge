@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 import os
 import shutil
@@ -20,7 +21,7 @@ class CacheCleaner(BaseCleaner):
         ]
 
         for target in paths_to_check:
-            if os.path.exists(target) and os.path.isdir(target):
+            if Path(target).exists() and Path(target).is_dir():
                 try:
                     shutil.rmtree(target)
                     logger.info(f"Dossier de cache supprimé : {target}")
