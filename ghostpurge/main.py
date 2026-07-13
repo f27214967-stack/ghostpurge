@@ -43,7 +43,7 @@ class GhostPurgeDaemon:
         self.cleaners = [cls(self.config) for cls in CleanerRegistry.get_cleaners()]
         self.watchers = [cls(self.config, self.handle_uninstall) for cls in WatcherRegistry.get_watchers()]
         
-        # File d'attente (pkg, source) -> timestamp
+        # Queue (pkg, source) -> timestamp
         self.pending_cleans: Dict[Tuple[str, str], float] = {}
 
     def handle_uninstall(self, package_name: str, source: str) -> None:
@@ -53,7 +53,7 @@ class GhostPurgeDaemon:
             logger.info(f"[{source}] Package {package_name} ignored (whitelist).")
             return
             
-        # On enregistre l'heure de la détection
+        # Record detection time
         self.pending_cleans[(package_name, source)] = time.time()
         logger.info(f"[{source}] Event intercepted for {package_name}. Anti-update verification (5s)...")
 
@@ -136,10 +136,10 @@ class GhostPurgeDaemon:
         try:
             while self.running:
                 for w in self.watchers:
-                    # Timeout court pour que la boucle tourne régulièrement
+                    # Short timeout to keep the loop running smoothly
                     w.check_events(timeout=1)
                 
-                # Vérifie la file d'attente à chaque cycle
+                # Check pending queue every cycle
                 self._process_pending_cleans()
         except Exception as e:
             logger.error(f"Critical error in main loop: {e}")

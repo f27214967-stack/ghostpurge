@@ -23,7 +23,7 @@ class PipWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_dir, self.mask)
             logger.info(f"Watching Pip on {self.watch_dir}")
         except Exception as e:
-            logger.error(f"Erreur watch Pip: {e}")
+            logger.error(f"Error watching Pip: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

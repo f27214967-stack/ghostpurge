@@ -23,7 +23,7 @@ class Config:
                 self.settings = yaml.safe_load(f) or {}
             logger.info(f"Configuration chargée depuis {self.config_path}")
         except Exception as e:
-            logger.error(f"Erreur de lecture de {self.config_path}: {e}")
+            logger.error(f"Error reading {self.config_path}: {e}")
             self._set_defaults()
 
     def _set_defaults(self) -> None:

@@ -23,7 +23,7 @@ class SteamWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_dir, self.mask)
             logger.info(f"Watching Steam on {self.watch_dir}")
         except Exception as e:
-            logger.error(f"Erreur watch Steam: {e}")
+            logger.error(f"Error watching Steam: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

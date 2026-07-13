@@ -23,7 +23,7 @@ class DpkgWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_file, self.mask)
             logger.info(f"Watching DPKG on {self.watch_file}")
         except Exception as e:
-            logger.error(f"Erreur watch DPKG: {e}")
+            logger.error(f"Error watching DPKG: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

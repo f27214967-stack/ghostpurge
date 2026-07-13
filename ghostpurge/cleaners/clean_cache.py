@@ -24,6 +24,6 @@ class CacheCleaner(BaseCleaner):
             if Path(target).exists() and Path(target).is_dir():
                 try:
                     shutil.rmtree(target)
-                    logger.info(f"Dossier de cache supprimé : {target}")
+                    logger.info(f"Cache folder deleted : {target}")
                 except Exception as e:
-                    logger.error(f"Erreur suppression {target}: {e}")
+                    logger.error(f"Error deleting {target}: {e}")

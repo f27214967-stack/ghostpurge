@@ -21,4 +21,4 @@ class SystemdCleaner(BaseCleaner):
                 run_command(["systemctl", "daemon-reload"])
                 logger.info(f"Service {package_name} supprimé.")
             except Exception as e:
-                logger.error(f"Erreur suppression {service_file}: {e}")
+                logger.error(f"Error deleting {service_file}: {e}")

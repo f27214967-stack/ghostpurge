@@ -23,7 +23,7 @@ class NpmWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_dir, self.mask)
             logger.info(f"Watching NPM on {self.watch_dir}")
         except Exception as e:
-            logger.error(f"Erreur watch NPM: {e}")
+            logger.error(f"Error watching NPM: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

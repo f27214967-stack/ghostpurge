@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class AppImageWatcher(BaseWatcher):
     def __init__(self, config: Config, callback: Callable[[str, str], None]) -> None:
         super().__init__(config, callback)
-        # Typiquement dans ~/Applications ou ~/bin
+        # Typically in ~/Applications or ~/bin
         self.watch_dir = os.path.expanduser("~/Applications")
         self.inotify = INotify()
         self.mask = flags.DELETE | flags.MOVED_FROM
@@ -25,7 +25,7 @@ class AppImageWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_dir, self.mask)
             logger.info(f"Watching AppImage on {self.watch_dir}")
         except Exception as e:
-            logger.error(f"Erreur watch AppImage: {e}")
+            logger.error(f"Error watching AppImage: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

@@ -21,9 +21,9 @@ class LogsCleaner(BaseCleaner):
         if Path(target_dir).exists() and Path(target_dir).is_dir():
             try:
                 shutil.rmtree(target_dir)
-                logger.info(f"Dossier de logs supprimé : {target_dir}")
+                logger.info(f"Logs folder deleted : {target_dir}")
             except Exception as e:
-                logger.error(f"Erreur suppression {target_dir}: {e}")
+                logger.error(f"Error deleting {target_dir}: {e}")
 
         pattern = os.path.join(log_dir, f"{package_name}*.log*")
         for filepath in glob.glob(pattern):
@@ -31,4 +31,4 @@ class LogsCleaner(BaseCleaner):
                 Path(filepath).unlink()
                 logger.info(f"Fichier de log supprimé : {filepath}")
             except Exception as e:
-                logger.error(f"Erreur suppression {filepath}: {e}")
+                logger.error(f"Error deleting {filepath}: {e}")

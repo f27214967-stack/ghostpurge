@@ -20,11 +20,11 @@ class OrphanCleaner(BaseCleaner):
                 subprocess.run(cmd, capture_output=True, text=True, env=env)
                 logger.info("APT orphans cleanup finished.")
             except Exception as e:
-                logger.error(f"Erreur autoremove: {e}")
+                logger.error(f"Autoremove error: {e}")
                 
         elif source == "flatpak":
             try:
                 subprocess.run(["flatpak", "uninstall", "--unused", "-y"], capture_output=True)
                 logger.info("Nettoyage Flatpak orphelins terminé.")
             except Exception as e:
-                logger.error(f"Erreur flatpak unused: {e}")
+                logger.error(f"Flatpak unused error: {e}")

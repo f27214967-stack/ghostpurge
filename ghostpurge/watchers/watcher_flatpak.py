@@ -23,7 +23,7 @@ class FlatpakWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_dir, self.mask)
             logger.info(f"Watching Flatpak on {self.watch_dir}")
         except Exception as e:
-            logger.error(f"Erreur watch Flatpak: {e}")
+            logger.error(f"Error watching Flatpak: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

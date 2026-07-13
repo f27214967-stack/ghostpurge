@@ -23,7 +23,7 @@ class SnapWatcher(BaseWatcher):
             self.inotify.add_watch(self.watch_dir, self.mask)
             logger.info(f"Watching Snap on {self.watch_dir}")
         except Exception as e:
-            logger.error(f"Erreur watch Snap: {e}")
+            logger.error(f"Error watching Snap: {e}")
 
     def check_events(self, timeout: int) -> None:
         with suppress(Exception):

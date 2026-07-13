@@ -29,6 +29,6 @@ class ConfigCleaner(BaseCleaner):
         if Path(user_config).exists() and Path(user_config).is_dir():
             try:
                 shutil.rmtree(user_config)
-                logger.info(f"Dossier de config utilisateur supprimé : {user_config}")
+                logger.info(f"User config folder deleted : {user_config}")
             except Exception as e:
-                logger.error(f"Erreur suppression config {user_config}: {e}")
+                logger.error(f"Error deleting config {user_config}: {e}")
