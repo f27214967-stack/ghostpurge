@@ -2,12 +2,11 @@ import pytest
 import os
 import shutil
 import time
-from pathlib import Path
 try:
     import winreg
     import win32serviceutil
-    import win32service
-    import wmi
+    import win32service # noqa: F401
+    import wmi # noqa: F401
 except ImportError:
     pass
 
@@ -111,7 +110,7 @@ def test_wmi_process_watcher(ghostpurge_service):
     # Clean up fake uninstaller
     try:
         os.remove(fake_uninstaller)
-    except:
+    except Exception: # noqa: E722
         pass
 
     # Since the uninstaller was just unins000.exe, GhostPurge might not know the exact package name

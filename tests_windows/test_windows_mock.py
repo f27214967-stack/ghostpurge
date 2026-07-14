@@ -13,7 +13,7 @@ sys.modules['wmi'] = mock_wmi
 sys.modules['win32serviceutil'] = mock_win32serviceutil
 
 # Now we can safely import the cleaner
-from ghostpurge.windows.cleaner_windows import WindowsCleaner
+from ghostpurge.windows.cleaner_windows import WindowsCleaner # noqa: E402
 
 class DummyConfig:
     pass
@@ -50,9 +50,12 @@ def test_mock_folder_cleanup(windows_cleaner):
         
         # Mock environment variables
         def env_side_effect(key, default=''):
-            if key == 'APPDATA': return 'C:\\Users\\Mock\\AppData\\Roaming'
-            if key == 'LOCALAPPDATA': return 'C:\\Users\\Mock\\AppData\\Local'
-            if key == 'ProgramData': return 'C:\\ProgramData'
+            if key == 'APPDATA':
+                return 'C:\\Users\\Mock\\AppData\\Roaming'
+            if key == 'LOCALAPPDATA':
+                return 'C:\\Users\\Mock\\AppData\\Local'
+            if key == 'ProgramData':
+                return 'C:\\ProgramData'
             return default
         mock_env.side_effect = env_side_effect
         
