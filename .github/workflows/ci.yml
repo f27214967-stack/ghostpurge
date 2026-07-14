@@ -34,3 +34,7 @@ jobs:
     - name: Complexity check with Xenon
       run: |
         xenon --max-absolute B --max-modules B --max-average A ghostpurge
+        
+    - name: Test with pytest
+      run: |
+        pytest
