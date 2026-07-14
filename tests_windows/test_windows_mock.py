@@ -2,17 +2,6 @@ import pytest
 import os
 from unittest.mock import patch, MagicMock
 
-# We must mock winreg and other Windows specifics before importing GhostPurge
-import sys
-mock_winreg = MagicMock()
-mock_wmi = MagicMock()
-mock_win32serviceutil = MagicMock()
-
-sys.modules['winreg'] = mock_winreg
-sys.modules['wmi'] = mock_wmi
-sys.modules['win32serviceutil'] = mock_win32serviceutil
-
-# Now we can safely import the cleaner
 from ghostpurge.windows.cleaner_windows import WindowsCleaner # noqa: E402
 
 class DummyConfig:
@@ -25,7 +14,8 @@ def windows_cleaner():
         cleaner = WindowsCleaner(DummyConfig())
         yield cleaner
 
-def test_mock_registry_cleanup(windows_cleaner):
+@patch('ghostpurge.windows.cleaner_windows.winreg')
+def test_mock_registry_cleanup(mock_winreg, windows_cleaner):
     """Test that the cleaner correctly targets Windows registry keys."""
     # Run the clean method
     windows_cleaner._clean_registry("TestApp")

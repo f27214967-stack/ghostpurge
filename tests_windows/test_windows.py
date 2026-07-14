@@ -23,15 +23,26 @@ def ghostpurge_service():
     import ghostpurge.windows.watcher_filesystem # noqa: F401
     import ghostpurge.windows.cleaner_windows # noqa: F401
     
+    # Ensure HKCU Uninstall key exists so watcher doesn't fail with Err: 2
+    try:
+        import winreg
+        hkcu_uninstall = r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
+        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, hkcu_uninstall)
+        winreg.CloseKey(key)
+    except Exception:
+        pass
+
     # Create config file
     progdata = os.environ.get('ProgramData', 'C:\\ProgramData')
     config_dir = os.path.join(progdata, 'GhostPurge')
     os.makedirs(config_dir, exist_ok=True)
     config_path = os.path.join(config_dir, 'ghostpurge.yaml')
-    log_file = os.path.join(config_dir, 'ghostpurge.log').replace("\\", "\\\\")
+    
+    # Use forward slashes for YAML to avoid escape sequence issues
+    log_file = os.path.join(config_dir, 'ghostpurge.log').replace("\\", "/")
     
     with open(config_path, "w") as f:
-        f.write(f"daemon:\n  log_file: {log_file}\n")
+        f.write(f"daemon:\n  log_file: '{log_file}'\n")
         
     daemon = GhostPurgeDaemon(config_path)
     
@@ -144,6 +155,7 @@ def test_logs_generated():
     log_file = os.path.join(progdata, 'GhostPurge', 'ghostpurge.log')
     
     assert os.path.exists(log_file), "Log file was not created"
+    time.sleep(1) # Allow logs to flush to disk
     with open(log_file, "r") as f:
         content = f.read()
         assert "GhostPurge" in content or "watcher" in content or "cleanup" in content
