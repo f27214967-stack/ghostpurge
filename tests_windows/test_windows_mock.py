@@ -41,7 +41,7 @@ def test_mock_registry_cleanup(mock_winreg: typing.Any, win_registry_cleaner: Cl
 def test_mock_folder_cleanup(win_folders_cleaner: CleanWinFolders) -> None:
     """Test that the cleaner targets correct Windows AppData paths."""
     with patch('os.environ.get') as mock_env, \
-         patch('os.path.exists', return_value=True), \
+         patch('pathlib.Path.exists', return_value=True), \
          patch('shutil.rmtree') as mock_rmtree:
         
         # Mock environment variables
