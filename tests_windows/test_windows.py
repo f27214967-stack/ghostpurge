@@ -3,6 +3,7 @@ import os
 import sys
 import shutil
 import time
+import typing
 try:
     import winreg
     import win32service # noqa: F401
@@ -11,24 +12,27 @@ except ImportError:
     pass
 
 @pytest.fixture(scope="module")
-def ghostpurge_service():
+def ghostpurge_service() -> typing.Generator[None, None, None]:
     """Ensure the GhostPurge service is running before tests and stopped after."""
     # Import daemon directly
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from ghostpurge.main import GhostPurgeDaemon
-    
     # Load Windows modules so they register themselves
-    import ghostpurge.windows.watcher_registry # noqa: F401
-    import ghostpurge.windows.watcher_wmi # noqa: F401
-    import ghostpurge.windows.watcher_filesystem # noqa: F401
-    import ghostpurge.windows.cleaner_windows # noqa: F401
+    import ghostpurge.watchers.watcher_win_registry # noqa: F401
+    import ghostpurge.watchers.watcher_win_wmi # noqa: F401
+    import ghostpurge.watchers.watcher_win_filesystem # noqa: F401
     
+    import ghostpurge.cleaners.clean_win_folders # noqa: F401
+    import ghostpurge.cleaners.clean_win_registry # noqa: F401
+    import ghostpurge.cleaners.clean_win_services # noqa: F401
+    import ghostpurge.cleaners.clean_win_tasks # noqa: F401
+    import ghostpurge.cleaners.clean_win_shortcuts # noqa: F401
     # Ensure HKCU Uninstall key exists so watcher doesn't fail with Err: 2
     try:
         import winreg
         hkcu_uninstall = r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
-        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, hkcu_uninstall)
-        winreg.CloseKey(key)
+        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, hkcu_uninstall) # type: ignore[attr-defined]
+        winreg.CloseKey(key) # type: ignore[attr-defined]
     except Exception:
         pass
 
@@ -55,21 +59,21 @@ def ghostpurge_service():
     daemon.running = False
     time.sleep(1)
 
-def test_registry_watcher(ghostpurge_service):
+def test_registry_watcher(ghostpurge_service: None) -> None:
     """Test if registry uninstalls are detected and cleaned."""
     test_pkg = "TestAppRegistry"
     
     # 1. Create a fake registry key for the app
     key_path = rf"Software\Microsoft\Windows\CurrentVersion\Uninstall\{test_pkg}"
     try:
-        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_path)
-        winreg.SetValueEx(key, "DisplayName", 0, winreg.REG_SZ, test_pkg)
-        winreg.CloseKey(key)
+        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_path) # type: ignore[attr-defined]
+        winreg.SetValueEx(key, "DisplayName", 0, winreg.REG_SZ, test_pkg) # type: ignore[attr-defined]
+        winreg.CloseKey(key) # type: ignore[attr-defined]
     except Exception as e:
         pytest.fail(f"Failed to create registry key: {e}")
 
     # 2. Create a fake leftover folder in AppData
-    appdata = os.environ.get('APPDATA')
+    appdata = os.environ.get('APPDATA', '')
     test_folder = os.path.join(appdata, test_pkg)
     os.makedirs(test_folder, exist_ok=True)
     
@@ -78,7 +82,7 @@ def test_registry_watcher(ghostpurge_service):
     
     # 3. Simulate uninstallation by deleting the registry key
     try:
-        winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_path)
+        winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_path) # type: ignore[attr-defined]
     except Exception as e:
         pytest.fail(f"Failed to delete registry key: {e}")
 
@@ -89,14 +93,14 @@ def test_registry_watcher(ghostpurge_service):
     # 5. Verify the leftover folder was deleted
     assert not os.path.exists(test_folder), f"Folder {test_folder} was not deleted by GhostPurge"
 
-def test_filesystem_cleaner(ghostpurge_service):
+def test_filesystem_cleaner(ghostpurge_service: None) -> None:
     """Test filesystem watcher for manual uninstalls/deletions."""
     test_pkg = "TestAppFS"
     
     prog_files = os.environ.get('ProgramFiles', 'C:\\Program Files')
     test_prog_folder = os.path.join(prog_files, test_pkg)
     
-    appdata = os.environ.get('APPDATA')
+    appdata = os.environ.get('APPDATA', '')
     test_appdata_folder = os.path.join(appdata, test_pkg)
     
     # Create the folders (requires admin rights for Program Files)
@@ -118,11 +122,11 @@ def test_filesystem_cleaner(ghostpurge_service):
     # Verify that the AppData folder was also cleaned up
     assert not os.path.exists(test_appdata_folder), "Filesystem watcher did not clean AppData leftovers"
 
-def test_wmi_process_watcher(ghostpurge_service):
+def test_wmi_process_watcher(ghostpurge_service: None) -> None:
     """Test WMI process stop trace for uninstaller."""
     test_pkg = "TestAppWMI"
     
-    appdata = os.environ.get('APPDATA')
+    appdata = os.environ.get('APPDATA', '')
     test_folder = os.path.join(appdata, test_pkg)
     os.makedirs(test_folder, exist_ok=True)
     
@@ -149,7 +153,7 @@ def test_wmi_process_watcher(ghostpurge_service):
     # without more context. This test ensures the WMI watcher is running without crashing.
     assert True
 
-def test_logs_generated():
+def test_logs_generated() -> None:
     """Verify that GhostPurge Windows logs are written."""
     progdata = os.environ.get('ProgramData', 'C:\\ProgramData')
     log_file = os.path.join(progdata, 'GhostPurge', 'ghostpurge.log')

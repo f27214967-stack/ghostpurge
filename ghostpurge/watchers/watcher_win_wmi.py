@@ -13,7 +13,7 @@ except ImportError:
 from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
 from ghostpurge.config import Config
 
-logger = logging.getLogger("ghostpurge.windows.watcher_wmi")
+logger = logging.getLogger("ghostpurge.watchers.watcher_win_wmi")
 
 class WindowsWMIWatcher(BaseWatcher):
     """Monitors Windows uninstalls via WMI (Win32_Product and ProcessStopTrace)"""

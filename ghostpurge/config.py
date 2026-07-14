@@ -19,7 +19,7 @@ class Config:
             return
         
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with self.config_path.open("r", encoding="utf-8") as f:
                 self.settings = yaml.safe_load(f) or {}
             logger.info(f"Configuration chargée depuis {self.config_path}")
         except Exception as e:

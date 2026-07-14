@@ -14,17 +14,22 @@ class OrphanCleaner(BaseCleaner):
         logger.info(f"[{source}] Searching for orphans after {package_name}...")
         
         if source == "apt":
-            env = {"DEBIAN_FRONTEND": "noninteractive"}
-            cmd = ["apt-get", "autoremove", "-y", "--purge"]
-            try:
-                subprocess.run(cmd, capture_output=True, text=True, env=env)
-                logger.info("APT orphans cleanup finished.")
-            except Exception as e:
-                logger.error(f"Autoremove error: {e}")
-                
+            self._clean_apt()
         elif source == "flatpak":
-            try:
-                subprocess.run(["flatpak", "uninstall", "--unused", "-y"], capture_output=True)
-                logger.info("Nettoyage Flatpak orphelins terminé.")
-            except Exception as e:
-                logger.error(f"Flatpak unused error: {e}")
+            self._clean_flatpak()
+
+    def _clean_apt(self) -> None:
+        env = {"DEBIAN_FRONTEND": "noninteractive"}
+        cmd = ["apt-get", "autoremove", "-y", "--purge"]
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, env=env)
+            logger.info("APT orphans cleanup finished.")
+        except Exception as e:
+            logger.error(f"Autoremove error: {e}")
+
+    def _clean_flatpak(self) -> None:
+        try:
+            subprocess.run(["flatpak", "uninstall", "--unused", "-y"], capture_output=True)
+            logger.info("Nettoyage Flatpak orphelins terminé.")
+        except Exception as e:
+            logger.error(f"Flatpak unused error: {e}")

@@ -4,6 +4,7 @@ import win32event
 import servicemanager
 import socket
 import os
+from pathlib import Path
 import sys
 import logging
 
@@ -34,11 +35,11 @@ class GhostPurgeService(win32serviceutil.ServiceFramework): # type: ignore
     def SvcDoRun(self) -> None:
         # Setup logging specific to the Windows service
         progdata = os.environ.get('ProgramData', 'C:\\ProgramData')
-        log_dir = os.path.join(progdata, 'GhostPurge')
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        log_dir = Path(progdata) / 'GhostPurge'
+        if not log_dir.exists():
+            log_dir.mkdir(parents=True)
         
-        log_file = os.path.join(log_dir, 'ghostpurge.log')
+        log_file = str(log_dir / 'ghostpurge.log')
         logging.basicConfig(
             filename=log_file,
             level=logging.INFO,
@@ -48,13 +49,12 @@ class GhostPurgeService(win32serviceutil.ServiceFramework): # type: ignore
         logger.info("GhostPurgeService starting...")
 
         try:
-            config_path = os.path.join(log_dir, "ghostpurge.yaml")
-            if not os.path.exists(config_path):
+            config_path = Path(log_dir) / "ghostpurge.yaml"
+            if not config_path.exists():
                 # Write an empty config if it doesn't exist
-                with open(config_path, "w") as f:
-                    f.write("daemon:\n  log_file: " + log_file.replace("\\", "\\\\") + "\n")
+                config_path.write_text("daemon:\n  log_file: " + log_file.replace("\\", "\\\\") + "\n")
             
-            self.daemon = GhostPurgeDaemon(config_path)
+            self.daemon = GhostPurgeDaemon(str(config_path))
             
             # Since the daemon uses a blocking loop, we can run it in a thread 
             # or just call it if it checks self.running properly.

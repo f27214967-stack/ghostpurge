@@ -18,6 +18,12 @@ class LogsCleaner(BaseCleaner):
         log_dir = self.config.get("paths.log_dir", "/var/log")
         
         target_dir = os.path.join(log_dir, package_name)
+        self._clean_directory(target_dir)
+
+        pattern = os.path.join(log_dir, f"{package_name}*.log*")
+        self._clean_files(pattern)
+
+    def _clean_directory(self, target_dir: str) -> None:
         if Path(target_dir).exists() and Path(target_dir).is_dir():
             try:
                 shutil.rmtree(target_dir)
@@ -25,7 +31,7 @@ class LogsCleaner(BaseCleaner):
             except Exception as e:
                 logger.error(f"Error deleting {target_dir}: {e}")
 
-        pattern = os.path.join(log_dir, f"{package_name}*.log*")
+    def _clean_files(self, pattern: str) -> None:
         for filepath in glob.glob(pattern):
             try:
                 Path(filepath).unlink()

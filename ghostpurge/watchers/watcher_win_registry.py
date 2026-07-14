@@ -7,12 +7,12 @@ from typing import Callable
 from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
 from ghostpurge.config import Config
 
-logger = logging.getLogger("ghostpurge.windows.watcher_registry")
+logger = logging.getLogger("ghostpurge.watchers.watcher_win_registry")
 
 if os.name == 'nt':
     import ctypes.wintypes
-    advapi32 = ctypes.windll.advapi32
-    kernel32 = ctypes.windll.kernel32
+    advapi32 = getattr(ctypes, "windll").advapi32 # type: ignore[attr-defined, unused-ignore]
+    kernel32 = getattr(ctypes, "windll").kernel32 # type: ignore[attr-defined, unused-ignore]
 
     # Constants
     HKEY_LOCAL_MACHINE = 0x80000002

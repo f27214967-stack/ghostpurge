@@ -6,12 +6,15 @@ import argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Load Windows modules so they register themselves
+import ghostpurge.watchers.watcher_win_registry # noqa: F401
+import ghostpurge.watchers.watcher_win_wmi # noqa: F401
+import ghostpurge.watchers.watcher_win_filesystem # noqa: F401
 
-# Load Windows modules so they register themselves
-import ghostpurge.windows.watcher_registry # noqa: F401
-import ghostpurge.windows.watcher_wmi # noqa: F401
-import ghostpurge.windows.watcher_filesystem # noqa: F401
-import ghostpurge.windows.cleaner_windows # noqa: F401
+import ghostpurge.cleaners.clean_win_folders # noqa: F401
+import ghostpurge.cleaners.clean_win_registry # noqa: F401
+import ghostpurge.cleaners.clean_win_services # noqa: F401
+import ghostpurge.cleaners.clean_win_tasks # noqa: F401
+import ghostpurge.cleaners.clean_win_shortcuts # noqa: F401
 
 from ghostpurge.main import GhostPurgeDaemon
 from ghostpurge.windows.windows_service import GhostPurgeService

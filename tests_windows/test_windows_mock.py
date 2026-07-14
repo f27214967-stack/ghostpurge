@@ -1,24 +1,30 @@
 import pytest
 import os
+import typing
 from unittest.mock import patch
 
-from ghostpurge.windows.cleaner_windows import WindowsCleaner # noqa: E402
+from ghostpurge.cleaners.clean_win_registry import CleanWinRegistry # noqa: E402
+from ghostpurge.cleaners.clean_win_folders import CleanWinFolders # noqa: E402
 
-class DummyConfig:
-    pass
+from ghostpurge.config import Config
 
 @pytest.fixture
-def windows_cleaner():
-    # Force os.name to 'nt' for the cleaner logic
+def win_registry_cleaner() -> typing.Generator[CleanWinRegistry, None, None]:
     with patch('os.name', 'nt'):
-        cleaner = WindowsCleaner(DummyConfig())
+        cleaner = CleanWinRegistry(Config())
         yield cleaner
 
-@patch('ghostpurge.windows.cleaner_windows.winreg')
-def test_mock_registry_cleanup(mock_winreg, windows_cleaner):
+@pytest.fixture
+def win_folders_cleaner() -> typing.Generator[CleanWinFolders, None, None]:
+    with patch('os.name', 'nt'):
+        cleaner = CleanWinFolders(Config())
+        yield cleaner
+
+@patch('ghostpurge.cleaners.clean_win_registry.winreg')
+def test_mock_registry_cleanup(mock_winreg: typing.Any, win_registry_cleaner: CleanWinRegistry) -> None:
     """Test that the cleaner correctly targets Windows registry keys."""
     # Run the clean method
-    windows_cleaner._clean_registry("TestApp")
+    win_registry_cleaner.clean("TestApp", "mock_source")
     
     # Assert that winreg.DeleteKey was called for the expected paths
     expected_calls = [
@@ -32,14 +38,14 @@ def test_mock_registry_cleanup(mock_winreg, windows_cleaner):
     for hkey, subkey in expected_calls:
         mock_winreg.DeleteKey.assert_any_call(hkey, subkey)
 
-def test_mock_folder_cleanup(windows_cleaner):
+def test_mock_folder_cleanup(win_folders_cleaner: CleanWinFolders) -> None:
     """Test that the cleaner targets correct Windows AppData paths."""
     with patch('os.environ.get') as mock_env, \
          patch('os.path.exists', return_value=True), \
          patch('shutil.rmtree') as mock_rmtree:
         
         # Mock environment variables
-        def env_side_effect(key, default=''):
+        def env_side_effect(key: str, default: str = '') -> str:
             if key == 'APPDATA':
                 return 'C:\\Users\\Mock\\AppData\\Roaming'
             if key == 'LOCALAPPDATA':
@@ -49,7 +55,7 @@ def test_mock_folder_cleanup(windows_cleaner):
             return default
         mock_env.side_effect = env_side_effect
         
-        windows_cleaner._clean_folders("TestApp")
+        win_folders_cleaner.clean("TestApp", "mock_source")
         
         # Verify rmtree was called on the correct concatenated paths
         assert mock_rmtree.call_count == 3

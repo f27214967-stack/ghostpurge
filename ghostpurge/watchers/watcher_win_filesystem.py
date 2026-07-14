@@ -1,6 +1,7 @@
 import logging
 import threading
 import os
+from pathlib import Path
 from typing import Callable
 
 try:
@@ -13,7 +14,7 @@ except ImportError:
 from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
 from ghostpurge.config import Config
 
-logger = logging.getLogger("ghostpurge.windows.watcher_filesystem")
+logger = logging.getLogger("ghostpurge.watchers.watcher_win_filesystem")
 
 class WindowsFilesystemWatcher(BaseWatcher):
     """Monitors Windows Filesystem for uninstalls"""
@@ -30,8 +31,8 @@ class WindowsFilesystemWatcher(BaseWatcher):
             appdata = os.environ.get('APPDATA', '')
             localappdata = os.environ.get('LOCALAPPDATA', '')
             
-            for p in [prog_files, prog_files_x86, appdata, localappdata]:
-                if p and os.path.exists(p):
+            for p in (prog_files, prog_files_x86, appdata, localappdata):
+                if p and Path(p).exists():
                     self.paths_to_watch.append(p)
 
     def start(self) -> None:

@@ -21,9 +21,12 @@ class CacheCleaner(BaseCleaner):
         ]
 
         for target in paths_to_check:
-            if Path(target).exists() and Path(target).is_dir():
-                try:
-                    shutil.rmtree(target)
-                    logger.info(f"Cache folder deleted : {target}")
-                except Exception as e:
-                    logger.error(f"Error deleting {target}: {e}")
+            self._clean_target(target)
+
+    def _clean_target(self, target: str) -> None:
+        if Path(target).exists() and Path(target).is_dir():
+            try:
+                shutil.rmtree(target)
+                logger.info(f"Cache folder deleted : {target}")
+            except Exception as e:
+                logger.error(f"Error deleting {target}: {e}")
