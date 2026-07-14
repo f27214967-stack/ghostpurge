@@ -1,6 +1,6 @@
 import pytest
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from ghostpurge.windows.cleaner_windows import WindowsCleaner # noqa: E402
 
