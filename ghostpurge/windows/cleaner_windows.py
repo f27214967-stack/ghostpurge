@@ -32,9 +32,12 @@ class WindowsCleaner:
         localappdata = os.environ.get('LOCALAPPDATA', '')
         progdata = os.environ.get('ProgramData', '')
         
-        if appdata: paths_to_check.append(os.path.join(appdata, package_name))
-        if localappdata: paths_to_check.append(os.path.join(localappdata, package_name))
-        if progdata: paths_to_check.append(os.path.join(progdata, package_name))
+        if appdata:
+            paths_to_check.append(os.path.join(appdata, package_name))
+        if localappdata:
+            paths_to_check.append(os.path.join(localappdata, package_name))
+        if progdata:
+            paths_to_check.append(os.path.join(progdata, package_name))
         
         for p in paths_to_check:
             if os.path.exists(p):

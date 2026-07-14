@@ -45,7 +45,7 @@ class WindowsFilesystemWatcher:
         logger.info("[fs] Windows Filesystem watchers started.")
 
     def _watch_path(self, path: str):
-        ACTIONS = {
+        ACTIONS = { # noqa: F841
             1: "Created",
             2: "Deleted",
             3: "Updated",
