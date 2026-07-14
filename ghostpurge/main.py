@@ -127,8 +127,12 @@ class GhostPurgeDaemon:
 
     def run(self) -> None:
         logger.info("Starting GhostPurge (with Anti-Update protection)...")
-        signal.signal(signal.SIGINT, self.stop)
-        signal.signal(signal.SIGTERM, self.stop)
+        try:
+            signal.signal(signal.SIGINT, self.stop)
+            signal.signal(signal.SIGTERM, self.stop)
+        except ValueError:
+            # We are not in the main thread (e.g. running in a test fixture thread)
+            logger.warning("Could not attach signal handlers (not in main thread).")
         
         for w in self.watchers:
             w.start()
