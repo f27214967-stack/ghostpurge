@@ -21,13 +21,13 @@ class CleanWinRegistry(BaseCleaner):
             return
             
         keys_to_check = [
-            (winreg.HKEY_CURRENT_USER, rf"Software\{package_name}"), # type: ignore[attr-defined]
-            (winreg.HKEY_LOCAL_MACHINE, rf"Software\{package_name}"), # type: ignore[attr-defined]
-            (winreg.HKEY_LOCAL_MACHINE, rf"Software\WOW6432Node\{package_name}") # type: ignore[attr-defined]
+            (winreg.HKEY_CURRENT_USER, rf"Software\{package_name}"), # type: ignore[attr-defined, unused-ignore]
+            (winreg.HKEY_LOCAL_MACHINE, rf"Software\{package_name}"), # type: ignore[attr-defined, unused-ignore]
+            (winreg.HKEY_LOCAL_MACHINE, rf"Software\WOW6432Node\{package_name}") # type: ignore[attr-defined, unused-ignore]
         ]
         for hkey, subkey in keys_to_check:
             try:
-                winreg.DeleteKey(hkey, subkey) # type: ignore[attr-defined]
+                winreg.DeleteKey(hkey, subkey) # type: ignore[attr-defined, unused-ignore]
                 logger.info(f"[clean_win_registry] Removed registry key: {subkey}")
             except FileNotFoundError:
                 pass
