@@ -33,12 +33,12 @@ jobs:
     - name: Type checking with Mypy (Linux)
       if: runner.os == 'Linux'
       run: |
-        mypy ghostpurge/linux ghostpurge/cleaners ghostpurge/watchers ghostpurge/main.py ghostpurge/config.py
+        mypy ghostpurge/cleaners ghostpurge/watchers ghostpurge/main.py ghostpurge/config.py ghostpurge/utils.py
         
     - name: Type checking with Mypy (Windows)
       if: runner.os == 'Windows'
       run: |
-        mypy ghostpurge/windows ghostpurge/cleaners ghostpurge/watchers ghostpurge/main_windows.py ghostpurge/config.py
+        mypy ghostpurge/windows ghostpurge/cleaners ghostpurge/watchers ghostpurge/main_windows.py ghostpurge/config.py ghostpurge/utils.py
         
     - name: Complexity check with Xenon
       run: |
