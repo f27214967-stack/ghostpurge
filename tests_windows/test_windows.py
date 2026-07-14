@@ -1,5 +1,6 @@
 import pytest
 import os
+import sys
 import shutil
 import time
 try:
@@ -13,16 +14,36 @@ except ImportError:
 @pytest.fixture(scope="module")
 def ghostpurge_service():
     """Ensure the GhostPurge service is running before tests and stopped after."""
-    try:
-        win32serviceutil.StartService("GhostPurge")
-    except Exception:
-        pass # Might already be running
-    time.sleep(5) # Give it time to initialize the daemon and enumerate keys
+    # Import daemon directly
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from ghostpurge.main import GhostPurgeDaemon
+    
+    # Load Windows modules so they register themselves
+    import ghostpurge.windows.watcher_registry # noqa: F401
+    import ghostpurge.windows.watcher_wmi # noqa: F401
+    import ghostpurge.windows.watcher_filesystem # noqa: F401
+    import ghostpurge.windows.cleaner_windows # noqa: F401
+    
+    # Create config file
+    progdata = os.environ.get('ProgramData', 'C:\\ProgramData')
+    config_dir = os.path.join(progdata, 'GhostPurge')
+    os.makedirs(config_dir, exist_ok=True)
+    config_path = os.path.join(config_dir, 'ghostpurge.yaml')
+    log_file = os.path.join(config_dir, 'ghostpurge.log').replace("\\", "\\\\")
+    
+    with open(config_path, "w") as f:
+        f.write(f"daemon:\n  log_file: {log_file}\n")
+        
+    daemon = GhostPurgeDaemon(config_path)
+    
+    import threading
+    t = threading.Thread(target=daemon.run, daemon=True)
+    t.start()
+    
+    time.sleep(5) # Give it time to initialize watchers
     yield
-    try:
-        win32serviceutil.StopService("GhostPurge")
-    except Exception:
-        pass
+    daemon.running = False
+    time.sleep(1)
 
 def test_registry_watcher(ghostpurge_service):
     """Test if registry uninstalls are detected and cleaned."""
