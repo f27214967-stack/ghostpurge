@@ -5,7 +5,6 @@ import shutil
 import time
 try:
     import winreg
-    import win32serviceutil
     import win32service # noqa: F401
     import wmi # noqa: F401
 except ImportError:
