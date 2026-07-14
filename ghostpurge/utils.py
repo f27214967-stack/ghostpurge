@@ -10,7 +10,8 @@ def setup_logging(log_file: str, log_level_str: str = "INFO") -> None:
         handlers=[
             logging.FileHandler(log_file),
             logging.StreamHandler()
-        ]
+        ],
+        force=True
     )
 
 def run_command(cmd: List[str]) -> Tuple[int, str, str]:
