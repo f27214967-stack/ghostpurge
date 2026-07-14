@@ -2,7 +2,7 @@ import logging
 import threading
 import os
 import ctypes
-from typing import Callable, Set
+from typing import Callable
 
 from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
 from ghostpurge.config import Config
