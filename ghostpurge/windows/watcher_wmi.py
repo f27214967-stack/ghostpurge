@@ -10,20 +10,20 @@ except ImportError:
     wmi = None
     pythoncom = None
 
-from ghostpurge.watchers.base import WatcherRegistry
+from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
+from ghostpurge.config import Config
 
 logger = logging.getLogger("ghostpurge.windows.watcher_wmi")
 
-class WindowsWMIWatcher:
+class WindowsWMIWatcher(BaseWatcher):
     """Monitors Windows uninstalls via WMI (Win32_Product and ProcessStopTrace)"""
     
-    def __init__(self, config, callback: Callable[[str, str], None]):
-        self.config = config
-        self.callback = callback
-        self.threads = []
+    def __init__(self, config: Config, callback: Callable[[str, str], None]) -> None:
+        super().__init__(config, callback)
+        self.threads: list[threading.Thread] = []
         self.running = False
 
-    def start(self):
+    def start(self) -> None:
         if not wmi or not pythoncom:
             return
         self.running = True
@@ -40,7 +40,7 @@ class WindowsWMIWatcher:
         
         logger.info("[wmi] Windows WMI watchers started.")
 
-    def _watch_win32_product(self):
+    def _watch_win32_product(self) -> None:
         pythoncom.CoInitialize()
         try:
             c = wmi.WMI()
@@ -63,7 +63,7 @@ class WindowsWMIWatcher:
         finally:
             pythoncom.CoUninitialize()
 
-    def _watch_processes(self):
+    def _watch_processes(self) -> None:
         pythoncom.CoInitialize()
         try:
             c = wmi.WMI()
@@ -86,10 +86,10 @@ class WindowsWMIWatcher:
         finally:
             pythoncom.CoUninitialize()
 
-    def check_events(self, timeout: int = 1):
+    def check_events(self, timeout: int = 1) -> None:
         pass
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
 
 if os.name == 'nt':

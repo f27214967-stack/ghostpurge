@@ -14,24 +14,24 @@ if project_root not in sys.path:
 
 from ghostpurge.main import GhostPurgeDaemon # noqa: E402
 
-class GhostPurgeService(win32serviceutil.ServiceFramework):
+class GhostPurgeService(win32serviceutil.ServiceFramework): # type: ignore
     _svc_name_ = "GhostPurge"
     _svc_display_name_ = "GhostPurge Daemon"
     _svc_description_ = "Automated uninstallation leftover cleaner."
 
-    def __init__(self, args):
+    def __init__(self, args: list[str]) -> None:
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
         socket.setdefaulttimeout(60)
-        self.daemon = None
+        self.daemon: GhostPurgeDaemon | None = None
 
-    def SvcStop(self):
+    def SvcStop(self) -> None:
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         win32event.SetEvent(self.hWaitStop)
         if self.daemon:
             self.daemon.running = False
 
-    def SvcDoRun(self):
+    def SvcDoRun(self) -> None:
         # Setup logging specific to the Windows service
         progdata = os.environ.get('ProgramData', 'C:\\ProgramData')
         log_dir = os.path.join(progdata, 'GhostPurge')

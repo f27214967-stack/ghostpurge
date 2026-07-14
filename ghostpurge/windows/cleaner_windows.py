@@ -5,15 +5,17 @@ import shutil
 try:
     import winreg
 except ImportError:
-    winreg = None
+    winreg = None # type: ignore
 
 from ghostpurge.cleaners.registry import CleanerRegistry
+from ghostpurge.cleaners.base import BaseCleaner
+from ghostpurge.config import Config
 
 logger = logging.getLogger("ghostpurge.windows.cleaner_windows")
 
-class WindowsCleaner:
-    def __init__(self, config):
-        self.config = config
+class WindowsCleaner(BaseCleaner):
+    def __init__(self, config: Config) -> None:
+        super().__init__(config)
 
     def clean(self, package_name: str, source: str) -> None:
         if os.name != 'nt':
@@ -26,7 +28,7 @@ class WindowsCleaner:
         self._clean_tasks(package_name)
         self._clean_shortcuts(package_name)
 
-    def _clean_folders(self, package_name: str):
+    def _clean_folders(self, package_name: str) -> None:
         paths_to_check = []
         appdata = os.environ.get('APPDATA', '')
         localappdata = os.environ.get('LOCALAPPDATA', '')
@@ -47,7 +49,7 @@ class WindowsCleaner:
                 except Exception as e:
                     logger.error(f"[cleaner] Failed to remove {p}: {e}")
 
-    def _clean_registry(self, package_name: str):
+    def _clean_registry(self, package_name: str) -> None:
         if not winreg:
             return
         keys_to_check = [
@@ -66,7 +68,7 @@ class WindowsCleaner:
             except Exception as e:
                 logger.error(f"[cleaner] Failed to remove registry key {subkey}: {e}")
 
-    def _clean_services(self, package_name: str):
+    def _clean_services(self, package_name: str) -> None:
         # Using sc query or wmi to find and delete services matching package_name
         try:
             import wmi
@@ -83,7 +85,7 @@ class WindowsCleaner:
         except Exception as e:
             logger.error(f"[cleaner] Error cleaning services: {e}")
 
-    def _clean_tasks(self, package_name: str):
+    def _clean_tasks(self, package_name: str) -> None:
         try:
             import win32com.client
             scheduler = win32com.client.Dispatch('Schedule.Service')
@@ -99,7 +101,7 @@ class WindowsCleaner:
         except Exception as e:
             logger.error(f"[cleaner] Error cleaning scheduled tasks: {e}")
 
-    def _clean_shortcuts(self, package_name: str):
+    def _clean_shortcuts(self, package_name: str) -> None:
         desktop = os.path.join(os.environ.get('USERPROFILE', ''), 'Desktop')
         start_menu = os.path.join(os.environ.get('APPDATA', ''), r'Microsoft\Windows\Start Menu\Programs')
         

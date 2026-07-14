@@ -4,7 +4,8 @@ import os
 import ctypes
 from typing import Callable, Set
 
-from ghostpurge.watchers.base import WatcherRegistry
+from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
+from ghostpurge.config import Config
 
 logger = logging.getLogger("ghostpurge.windows.watcher_registry")
 
@@ -23,25 +24,23 @@ if os.name == 'nt':
     WAIT_OBJECT_0 = 0
     WAIT_TIMEOUT = 258
 
-class WindowsRegistryWatcher:
+class WindowsRegistryWatcher(BaseWatcher):
     """Monitors Windows Registry for uninstalls using native ctypes API"""
     
-    def __init__(self, config, callback: Callable[[str, str], None]):
-        self.config = config
-        self.callback = callback
+    def __init__(self, config: Config, callback: Callable[[str, str], None]) -> None:
+        super().__init__(config, callback)
+        self.keys_to_watch: list[tuple[int, str]] = []
         if os.name == 'nt':
             self.keys_to_watch = [
                 (HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
                 (HKEY_LOCAL_MACHINE, r"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
                 (HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Uninstall")
             ]
-        else:
-            self.keys_to_watch = []
-        self.threads = []
+        self.threads: list[threading.Thread] = []
         self.running = False
         self.stop_event = None
 
-    def start(self):
+    def start(self) -> None:
         if os.name != 'nt':
             return
             
@@ -54,8 +53,8 @@ class WindowsRegistryWatcher:
             t.start()
         logger.info("[registry] Windows Registry ctypes watcher started.")
 
-    def _get_subkeys(self, hkey_root, subkey_path) -> Set[str]:
-        subkeys = set()
+    def _get_subkeys(self, hkey_root: int, subkey_path: str) -> set[str]:
+        subkeys: set[str] = set()
         hkey = ctypes.wintypes.HKEY()
         res = advapi32.RegOpenKeyExW(hkey_root, subkey_path, 0, KEY_READ, ctypes.byref(hkey))
         if res != 0:
@@ -76,7 +75,7 @@ class WindowsRegistryWatcher:
         advapi32.RegCloseKey(hkey)
         return subkeys
 
-    def _watch_key(self, hkey_root, subkey_path):
+    def _watch_key(self, hkey_root: int, subkey_path: str) -> None:
         hkey = ctypes.wintypes.HKEY()
         res = advapi32.RegOpenKeyExW(hkey_root, subkey_path, 0, KEY_NOTIFY | KEY_READ, ctypes.byref(hkey))
         if res != 0:
@@ -111,10 +110,10 @@ class WindowsRegistryWatcher:
         advapi32.RegCloseKey(hkey)
         kernel32.CloseHandle(change_event)
 
-    def check_events(self, timeout: int = 1):
+    def check_events(self, timeout: int = 1) -> None:
         pass
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
         if os.name == 'nt' and self.stop_event:
             kernel32.SetEvent(self.stop_event)

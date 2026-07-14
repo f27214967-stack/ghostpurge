@@ -10,19 +10,19 @@ except ImportError:
     win32file = None
     win32con = None
 
-from ghostpurge.watchers.base import WatcherRegistry
+from ghostpurge.watchers.base import WatcherRegistry, BaseWatcher
+from ghostpurge.config import Config
 
 logger = logging.getLogger("ghostpurge.windows.watcher_filesystem")
 
-class WindowsFilesystemWatcher:
+class WindowsFilesystemWatcher(BaseWatcher):
     """Monitors Windows Filesystem for uninstalls"""
     
-    def __init__(self, config, callback: Callable[[str, str], None]):
-        self.config = config
-        self.callback = callback
-        self.threads = []
+    def __init__(self, config: Config, callback: Callable[[str, str], None]) -> None:
+        super().__init__(config, callback)
+        self.threads: list[threading.Thread] = []
         self.running = False
-        self.paths_to_watch = []
+        self.paths_to_watch: list[str] = []
         
         if os.name == 'nt':
             prog_files = os.environ.get('ProgramFiles', 'C:\\Program Files')
@@ -34,7 +34,7 @@ class WindowsFilesystemWatcher:
                 if p and os.path.exists(p):
                     self.paths_to_watch.append(p)
 
-    def start(self):
+    def start(self) -> None:
         if not win32file:
             return
         self.running = True
@@ -44,7 +44,7 @@ class WindowsFilesystemWatcher:
             t.start()
         logger.info("[fs] Windows Filesystem watchers started.")
 
-    def _watch_path(self, path: str):
+    def _watch_path(self, path: str) -> None:
         ACTIONS = { # noqa: F841
             1: "Created",
             2: "Deleted",
@@ -86,10 +86,10 @@ class WindowsFilesystemWatcher:
                 logger.error(f"[fs] Error watching {path}: {e}")
                 break
 
-    def check_events(self, timeout: int = 1):
+    def check_events(self, timeout: int = 1) -> None:
         pass
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
 
 if os.name == 'nt':
