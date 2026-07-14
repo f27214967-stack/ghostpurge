@@ -21,13 +21,14 @@ import ghostpurge.cleaners.clean_orphans  # noqa: F401
 import ghostpurge.cleaners.clean_systemd  # noqa: F401
 
 # Watchers
-import ghostpurge.watchers.watcher_dpkg  # noqa: F401
-import ghostpurge.watchers.watcher_flatpak  # noqa: F401
-import ghostpurge.watchers.watcher_snap  # noqa: F401
-import ghostpurge.watchers.watcher_appimage  # noqa: F401
-import ghostpurge.watchers.watcher_steam  # noqa: F401
-import ghostpurge.watchers.watcher_pip  # noqa: F401
-import ghostpurge.watchers.watcher_npm  # noqa: F401
+if os.name != 'nt':
+    import ghostpurge.watchers.watcher_dpkg  # noqa: F401
+    import ghostpurge.watchers.watcher_flatpak  # noqa: F401
+    import ghostpurge.watchers.watcher_snap  # noqa: F401
+    import ghostpurge.watchers.watcher_appimage  # noqa: F401
+    import ghostpurge.watchers.watcher_steam  # noqa: F401
+    import ghostpurge.watchers.watcher_pip  # noqa: F401
+    import ghostpurge.watchers.watcher_npm  # noqa: F401
 
 logger = logging.getLogger("ghostpurge.main")
 
