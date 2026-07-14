@@ -38,7 +38,7 @@ jobs:
     - name: Type checking with Mypy (Windows)
       if: runner.os == 'Windows'
       run: |
-        mypy ghostpurge/windows ghostpurge/cleaners ghostpurge/watchers ghostpurge/main_windows.py ghostpurge/config.py ghostpurge/utils.py
+        mypy ghostpurge/windows ghostpurge/cleaners ghostpurge/watchers main_windows.py ghostpurge/config.py ghostpurge/utils.py
         
     - name: Complexity check with Xenon
       run: |

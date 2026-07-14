@@ -16,7 +16,7 @@ import ghostpurge.windows.cleaner_windows # noqa: F401
 from ghostpurge.main import GhostPurgeDaemon
 from ghostpurge.windows.windows_service import GhostPurgeService
 
-def handle_service_command(args):
+def handle_service_command(args: argparse.Namespace) -> None:
     svc_args = ["windows_service.py"]
     if args.install:
         svc_args.append("install")
@@ -31,7 +31,7 @@ def handle_service_command(args):
     import win32serviceutil
     win32serviceutil.HandleCommandLine(GhostPurgeService)
 
-def handle_console(args):
+def handle_console(args: argparse.Namespace) -> None:
     progdata = os.environ.get('ProgramData', 'C:\\ProgramData')
     config_path = args.config or os.path.join(progdata, 'GhostPurge', 'ghostpurge.yaml')
     if not os.path.exists(config_path):
@@ -42,7 +42,7 @@ def handle_console(args):
     daemon = GhostPurgeDaemon(config_path)
     daemon.run()
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="GhostPurge Windows")
     parser.add_argument("--install", action="store_true", help="Install the Windows Service")
     parser.add_argument("--remove", action="store_true", help="Remove the Windows Service")
